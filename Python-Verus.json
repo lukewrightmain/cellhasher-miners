@@ -9,8 +9,10 @@
     "installScriptLanguage": "Python",
     "runScriptLanguage": "Python",
     "stopScriptLanguage": "Python",
-    "id": "fc184bc3-d4f1-49d8-8b14-c777f1b33ba6"
+    "id": "f25cc717-b67f-4990-b91f-8db7f9757b14",
+    "uninstallScript": "import os, time, subprocess\r\nfrom concurrent.futures import ThreadPoolExecutor, as_completed\r\n\r\ndevices        = os.environ.get(\"devices\", \"\").split()\r\nwallet_address = os.environ.get(\"wallet_address\", \"\")\r\npool_url       = os.environ.get(\"pool_url\", \"\")\r\nthreads        = os.environ.get(\"threads\", \"8\")\r\n\r\n# How long to wait after opening Termux (seconds). Override via env TERMUX_WARMUP=7, etc.\r\nTERMUX_WARMUP = float(os.environ.get(\"TERMUX_WARMUP\", \"5\"))\r\n\r\ndef type_cmd(device_id, cmd, pause=0.3):\r\n    # adb 'input text' needs spaces as %s\r\n    escaped = cmd.replace(\" \", \"%s\")\r\n    subprocess.run(f'adb -s {device_id} shell input text \"{escaped}\"', shell=True)\r\n    time.sleep(pause)\r\n    subprocess.run(f\"adb -s {device_id} shell input keyevent 66\", shell=True)\r\n    time.sleep(pause)\r\n\r\ndef uninstall_miner_on_device(device_id):\r\n    try:\r\n        print(f\"[{device_id}] Starting miner uninstallation...\")\r\n        subprocess.run(f\"adb -s {device_id} shell am force-stop com.termux\", shell=True)\r\n        time.sleep(1)\r\n\r\n        subprocess.run(f\"adb -s {device_id} shell am start -n com.termux/com.termux.app.TermuxActivity\", shell=True)\r\n        time.sleep(TERMUX_WARMUP)  # extra warm-up time for slow devices\r\n\r\n        # small poke so the prompt is definitely ready\r\n        type_cmd(device_id, \"clear\", pause=0.2)\r\n\r\n        # Remove the entire bitcoin-mining directory\r\n        type_cmd(device_id, \"rm -rf ~/ccminer\")\r\n\r\n        print(f\"[{device_id}] Miner uninstalled successfully!\")\r\n        return f\"[{device_id}] OK\"\r\n    except Exception as e:\r\n        print(f\"[{device_id}] Error: {e}\")\r\n        return f\"[{device_id}] Error: {e}\"\r\n\r\nprint(\"=== Uninstalling Verus Miner (Parallel) ===\")\r\nwith ThreadPoolExecutor(max_workers=max(1, len(devices))) as ex:\r\n    futs = {ex.submit(uninstall_miner_on_device, d): d for d in devices}\r\n    for f in as_completed(futs):\r\n        print(f.result())",
+    "uninstallScriptLanguage": "Python"
   },
-  "timestamp": "2025-09-08T21:15:03.752Z",
+  "timestamp": "2025-10-02T17:42:12.755Z",
   "version": "1.0.0"
 }
