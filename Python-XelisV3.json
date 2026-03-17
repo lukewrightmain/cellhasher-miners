@@ -11,8 +11,9 @@
     "runScriptLanguage": "Python",
     "stopScriptLanguage": "Python",
     "uninstallScriptLanguage": "Python",
-    "id": "62c23fe8-a6d3-4faf-bea1-bd53f9444b00"
+    "id": "62c23fe8-a6d3-4faf-bea1-bd53f9444b00",
+    "installCheckPath": "proot://ubuntu/XelisV3/xelis_miner"
   },
-  "timestamp": "2026-03-04T02:42:26.707Z",
+  "timestamp": "2026-03-17T19:57:55.917Z",
   "version": "1.0.0"
 }
